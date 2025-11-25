@@ -1,0 +1,29 @@
+import mongoose from "mongoose";
+
+const mealSchema = new mongoose.Schema({
+  // Reference to the User who logged the meal
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User",
+    required: true // Added required for security/data integrity
+  },
+  // The raw text input from the user (e.g., "chicken breast, rice, broccoli")
+  text: {
+    type: String,
+    required: true
+  },
+  // The JSON object returned by the OpenAI analysis
+  result: {
+    type: Object,
+    required: true
+  },
+  // Timestamp for when the meal was logged
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
+  }
+});
+
+const Meal = mongoose.model("Meal", mealSchema);
+
+export default Meal;
