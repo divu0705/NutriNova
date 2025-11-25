@@ -1,0 +1,24 @@
+import express from "express";
+import Meal from "../models/Meal.js";
+import { protect } from "../middleware/authMiddleware.js";
+
+const router = express.Router();
+
+// @route   GET /api/meals/history
+// @desc    Get the meal history for the authenticated user
+// @access  Private (requires token)
+router.get("/history", protect, async (req, res) => {
+  try {
+    // Find all meals belonging to the authenticated user ID (req.user)
+    // Sort by createdAt in descending order (-1) to show newest first
+    const meals = await Meal.find({ userId: req.user }).sort({ createdAt: -1 });
+    
+    res.json(meals);
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error fetching meal history." });
+  }
+});
+
+export default router;
