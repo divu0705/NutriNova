@@ -1,0 +1,30 @@
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+// Ensure JWT_SECRET is loaded from .env
+dotenv.config();
+
+export const protect = (req, res, next) => {
+  // 1. Check for token in the Authorization header (Bearer <token>)
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    // If no token is found, deny access
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
+
+  try {
+    // 2. Verify the token using the secret key
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // 3. Attach the user ID from the token payload to the request object
+    // The user ID (id) is stored in the token payload during login/signup
+    req.user = decoded.id; 
+    
+    // 4. Continue to the next middleware or route handler
+    next();
+  } catch (error) {
+    // If verification fails (e.g., token expired, invalid signature)
+    res.status(401).json({ message: "Invalid token" });
+  }
+};
